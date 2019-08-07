@@ -1,0 +1,112 @@
+# import UserOrderByInput, PostOrderByInput from './generated/prisma.graphql'
+
+
+type Query {
+    users(query:String, first: Int, skip:Int, after:String, orderBy:UserOrderByInput):[User!]!
+    posts(query:String, first:Int, skip:Int, after:String, orderBy:PostOrderByInput):[Post!]!
+    myPost(query:String, first:Int, skip:Int, after:String):[Post!]!
+    comments(first:Int, skip:Int, after:String):[Comment!]!
+}
+
+type Mutation {
+    createUser(data:CreateUserInput!):AuthUser!
+    login(data:LoginExistingUsers!):AuthUser!
+    deleteUser:User!
+    updateUser(data: UpdateUser):User!
+    createPost(data:CreatePostInput!):Post!
+    deletePost(id:ID!):Post!
+    updatePost(id:ID!, data:UpdatePost!):Post!
+    createComment(data:CreateCommentInput!):Comment!
+    deleteComment(id:ID!):Comment!
+    updateComment(id:ID!, data:UpdateComment!):Comment!
+}
+
+type Subscription {
+    comment(postid:ID!):CommentSubscriptionPayload!
+    post:PostSubscriptionPayload!
+}
+
+input CreateUserInput{
+    name:String!
+    email:String!
+    password:String!
+}
+
+type AuthUser {
+    token:String!
+    user:User!
+}
+
+input LoginExistingUsers {
+    email:String!
+    password:String!
+}
+
+input UpdateUser {
+    name:String
+    email:String
+    password:String
+}
+
+input CreatePostInput {
+    title:String!
+    body:String!
+    published:Boolean!
+}
+
+input UpdatePost {
+    title:String
+    body:String
+}
+
+input CreateCommentInput{
+    text:String!
+    post:ID!
+}
+
+input UpdateComment {
+    text:String
+}
+
+type User {
+    id:ID!
+    name:String!
+    email:String
+    password:String!
+    posts:[Post!]!
+    comments:[Comment!]!
+    updatedAt:String!
+    createdAt:String!
+}
+
+type Post {
+    id:ID!
+    title:String!
+    body:String!
+    published:Boolean!
+    author:User!
+    comment:[Comment!]!
+}
+
+type Comment {
+    id:ID!,
+    text:String!
+    author:User!
+    post:[Post!]!
+}
+
+enum MutationType {
+    CREATED
+    UPDATED
+    DELETED
+}
+
+type PostSubscriptionPayload {
+    mutation:MutationType!
+    node:Post
+}
+
+type CommentSubscriptionPayload {
+    mutation:MutationType!
+    node:Comment!
+}
